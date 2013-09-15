@@ -56,16 +56,17 @@ end
 -- Check if we need to lead or follow
 role = args[1]
 distance = args[2] or ""
+width = args[3] or ""
 if role == "lead" then
     if get_from_pastebin("lead") then
-        return shell.run("lead " .. distance)
+        return shell.run("lead " .. distance .. " " .. width)
     end
 elseif role == "follow" then
     if get_from_pastebin("follow") then
-        return shell.run("follow " .. distance)
+        return shell.run("follow " .. distance .. " " .. width)
     end
 else
-    error("Usage Error:\nThe mining launcher must be told to 'lead' or 'follow'.\nUsage: script_name [lead|follow] [optional distance]")
+    error("Usage Error:\nThe mining launcher must be told to 'lead' or 'follow'.\nUsage: script_name <lead|follow> length [width]")
 end
 
 -- Return true in case the launcher was called programmatically
