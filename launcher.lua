@@ -11,10 +11,9 @@ local VERSION = "alpha"
 
 -- TODO:
 --  * Make launcher robust for startup use
---  * Change Redstone message protocol to handle triple handshake better (SYN, SYNACK, ACK)
+--  * Change handshake to time out and try to recover
 --  * State recovery on startup (chunk loading/desync issues)
 --  * Fuel use on as as needed basis (store in slot 15?)
---  * 2 dimensional mining directives
 
 -- Pastebin codes
 local pastebin = {}
