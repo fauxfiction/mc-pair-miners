@@ -39,4 +39,3 @@ function create_meta_table()
     setmetatable(tbl, mt)
     return tbl
 end
-

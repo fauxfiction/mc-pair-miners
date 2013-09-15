@@ -31,14 +31,19 @@ function get_from_pastebin(name)
 end
 
 -- Run prerequisite scripts
-get_from_pastebin("metatable")
-shell.run("metatable")
-get_from_pastebin("redstone_comms")
-shell.run("redstone_comms")
+function require(name)
+    get_from_pastebin(name)
+    shell.run(name)
+end
+require("metatable")
+require("redstone_comms")
 
 -- Globals
 REDSTONE = create_meta_table()
 REDSTONE["READY"] = 1
+REDSTONE["SYN"] = 2
+REDSTONE["SYNACK"] = 3
+REDSTONE["ACK"] = 4
 REDSTONE["QUERY"] = 15
 
 -- Mainline
