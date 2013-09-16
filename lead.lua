@@ -10,7 +10,9 @@ function mine_forward()
     end
 
     for i=1,length do
-        triple_handshake('back')
+        if not triple_handshake("back") then
+            return false
+        end
 
         turtle.digUp()
         turtle.digDown()
@@ -27,12 +29,15 @@ function mine_forward()
         turtle.down()
         turtle.digDown()
 
-        triple_handshake('back')
+        if not triple_handshake("back") then
+            return false
+        end
         turtle.dig()
         turtle.forward()
         state["progress"]["x"] = state["progress"]["x"] + 1
         print("Progress: x="..state["progress"]["x"])
     end
+    return true
 end
 
 function turn(direction, count)
@@ -71,16 +76,21 @@ else
 end
 
 for i=1,state["directive"]["y"] do
-    mine_forward(state["directive"]["x"])
 
-    if state["progress"]["y"] % 2 == 1 then
-        next_turn = 'left'
+    if mine_forward(state["directive"]["x"]) then
+        if state["progress"]["y"] % 2 == 1 then
+            next_turn = "left"
+        else
+            next_turn = "right"
+        end
+        turn(next_turn, 2)
+        state["progress"]["y"] = state["progress"]["y"] + 1
+        print("Progress: y="..state["progress"]["y"])
     else
-        next_turn = 'right'
+        print("Lost follower! I'm going to stop here.")
+        break
     end
-    turn(next_turn, 2)
-    state["progress"]["y"] = state["progress"]["y"] + 1
-    print("Progress: y="..state["progress"]["y"])
+    
 end
 
 f = fs.open("_state", "w")

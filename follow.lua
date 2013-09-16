@@ -10,7 +10,9 @@ function mine_forward()
     end
 
     for i=1,length do
-        triple_handshake("front")
+        if not triple_handshake("front") then
+            return false
+        end
 
         while turtle.detect() do
             sleep(0.1)
@@ -26,7 +28,9 @@ function mine_forward()
         turtle.select(1)
         turtle.dig()
 
-        triple_handshake('front')
+        if not triple_handshake("front") then
+            return false
+        end
         while turtle.detect() do
             sleep(0.1)
         end
@@ -34,6 +38,7 @@ function mine_forward()
         state["progress"]["x"] = state["progress"]["x"] + 1
         print("Progress: x="..state["progress"]["x"])
     end
+    return true
 end
 
 function turn(direction, count)
@@ -42,9 +47,9 @@ function turn(direction, count)
             sleep(0.5)
         end
         turtle.forward()
-        if direction == 'left' then
+        if direction == "left" then
             turtle.turnLeft()
-        elseif direction == 'right' then
+        elseif direction == "right" then
             turtle.turnRight()
         else
             return false
@@ -73,16 +78,21 @@ else
 end
 
 for i=1,state["directive"]["y"] do
-    mine_forward(state["directive"]["x"])
 
-    if state["progress"]["y"] % 2 == 1 then
-        next_turn = 'left'
+    if mine_forward(state["directive"]["x"]) then
+        if state["progress"]["y"] % 2 == 1 then
+            next_turn = "left"
+        else
+            next_turn = "right"
+        end
+        turn(next_turn, 2)
+        state["progress"]["y"] = state["progress"]["y"] + 1
+        print("Progress: y="..state["progress"]["y"])
     else
-        next_turn = 'right'
+        print("Lost leader! I'm going to stop here.")
+        break
     end
-    turn(next_turn, 2)
-    state["progress"]["y"] = state["progress"]["y"] + 1
-    print("Progress: y="..state["progress"]["y"])
+
 end
 
 f = fs.open("_state", "w")
