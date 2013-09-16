@@ -1,8 +1,6 @@
-function redstone_pulse(side, type)
-    print("Pulsing redstone " .. type .. " on ".. side)
+function redstone_signal(side, type)
+    print("Signalling redstone " .. type .. " on ".. side)
     redstone.setAnalogOutput(side, REDSTONE[type])
-    sleep(0.1)
-    redstone.setAnalogOutput(side, 0)
 end
 
 function redstone_timeout()
@@ -17,8 +15,11 @@ end
 function redstone_listen(side)
     print("Waiting for redstone on ".. side)
     e = parallel.waitForAny(redstone_pullevent, redstone_timeout)
+    print(e)
     if e == 1 then -- waitForAny currently returns the arg number of the function that returned
-        return REDSTONE[redstone.getAnalogInput(side)]
+        local rs = redstone.getAnalogInput(side)
+        print(rs)
+        return REDSTONE[rs]
     else
         if side == "front" then
             print("Trying to move forward")
@@ -31,18 +32,22 @@ function redstone_listen(side)
 end
 
 function triple_handshake(side)
-    redstone_pulse(side, "SYN")
+    redstone_signal(side, "SYN")
     for i=1,5 do
         response = redstone_listen(side)
+        print(response)
         if response == "SYN" then
-            redstone_pulse(side, "SYNACK")
+            redstone_signal(side, "SYNACK")
         elseif response == "SYNACK" then
-            redstone_pulse(side, "ACK")
+            redstone_signal(side, "ACK")
+            sleep(0.2)
+            redstone_signal(side, "OFF")
             return true
         elseif response == "ACK" then
+            redstone_signal(side, "OFF")
             return true
         else
-            redstone_pulse(side, "SYN")
+            redstone_signal(side, "SYN")
         end
     end
     return false

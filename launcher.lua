@@ -11,7 +11,6 @@ local VERSION = "alpha"
 
 -- TODO:
 --  * Make launcher robust for startup use
---  * Change handshake to time out and try to recover
 --  * State recovery on startup (chunk loading/desync issues)
 --  * Fuel use on as as needed basis (store in slot 15?)
 
@@ -39,6 +38,7 @@ require("redstone_comms")
 
 -- Globals
 REDSTONE = create_meta_table()
+REDSTONE["OFF"] = 0
 REDSTONE["READY"] = 1
 REDSTONE["SYN"] = 2
 REDSTONE["SYNACK"] = 3
