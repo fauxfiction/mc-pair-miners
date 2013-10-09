@@ -16,6 +16,7 @@ local VERSION = "alpha"
 
 -- Pastebin codes
 local pastebin = {}
+pastebin["startup"] = "KTCCn0qe"
 pastebin["launcher"] = "whDW3XJG"
 pastebin["lead"] = "LDuvasMW"
 pastebin["follow"] = "eEjhpYeV"
@@ -27,6 +28,17 @@ function get_from_pastebin(name)
     fs.delete(name)
     return shell.run("rom/programs/http/pastebin get " .. pastebin[name] .. " " .. name)
 end
+
+-- Check for updates
+-- Forced update only for now
+args = {...}
+if args[1] == "forceupdate" then
+    print("Updating the launcher")
+    return get_from_pastebin("launcher")
+end
+
+-- Download startup recovery script
+get_from_pastebin("startup")
 
 -- Run prerequisite scripts
 function require(name)
@@ -46,12 +58,6 @@ REDSTONE["ACK"] = 4
 REDSTONE["QUERY"] = 15
 
 -- Mainline
-args = {...}
-if args[1] == "forceupdate" then
-    print("Updating the launcher")
-    return get_from_pastebin("launcher")
-end
-
 -- Check if we need to lead or follow
 role = args[1]
 distance = args[2] or ""
