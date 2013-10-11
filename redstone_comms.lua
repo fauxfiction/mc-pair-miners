@@ -1,28 +1,43 @@
-function redstone_signal(side, type)
-    print("Signalling redstone " .. type .. " on ".. side)
+local import = import or _G["import"]
+
+local log = import("log")
+local LOG_LEVEL = LOG_LEVEL or _G["LOG_LEVEL"]
+
+local mt = import("metatable")
+
+local REDSTONE = mt.create_meta_table()
+REDSTONE["OFF"] = 0
+REDSTONE["READY"] = 1
+REDSTONE["SYN"] = 2
+REDSTONE["SYNACK"] = 3
+REDSTONE["ACK"] = 4
+REDSTONE["QUERY"] = 15
+
+local function signal(side, type)
+    log.debug("Signalling redstone " .. type .. " on ".. side)
     redstone.setAnalogOutput(side, REDSTONE[type])
 end
 
-function redstone_timeout()
+local function timeout()
     sleep(5)
     return nil
 end
 
-function redstone_pullevent()
+local function pullevent()
     return os.pullEvent('redstone')
 end
 
-function redstone_listen(side)
-    print("Waiting for redstone on ".. side)
-    e = parallel.waitForAny(redstone_pullevent, redstone_timeout)
-    print(e)
+local function listen(side)
+    log.debug("Waiting for redstone on ".. side)
+    e = parallel.waitForAny(pullevent, timeout)
+    log.debug(e)
     if e == 1 then -- waitForAny currently returns the arg number of the function that returned
         local rs = redstone.getAnalogInput(side)
-        print(rs)
+        log.debug(rs)
         return REDSTONE[rs]
     else
         if side == "front" then
-            print("Trying to move forward")
+            log.debug("Trying to move forward")
             if not turtle.detect() then
                 turtle.forward()
                 return nil
@@ -31,24 +46,27 @@ function redstone_listen(side)
     end
 end
 
-function triple_handshake(side)
-    redstone_signal(side, "SYN")
+local function triple_handshake(side)
+    signal(side, "SYN")
     for i=1,5 do
-        response = redstone_listen(side)
-        print(response)
+        response = listen(side)
+        log.debug(response)
         if response == "SYN" then
-            redstone_signal(side, "SYNACK")
+            signal(side, "SYNACK")
         elseif response == "SYNACK" then
-            redstone_signal(side, "ACK")
+            signal(side, "ACK")
             sleep(0.2)
-            redstone_signal(side, "OFF")
+            signal(side, "OFF")
             return true
         elseif response == "ACK" then
-            redstone_signal(side, "OFF")
+            signal(side, "OFF")
             return true
         else
-            redstone_signal(side, "SYN")
+            signal(side, "SYN")
         end
     end
     return false
 end
+
+log.debug("Exporting redstone_comms")
+_export = {triple_handshake=triple_handshake}

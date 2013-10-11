@@ -1,9 +1,9 @@
-function create_meta_table()
-    tbl = {}
+local function create_meta_table()
+    local tbl = {}
     tbl.r_index = {}
     tbl.r_table = {}
 
-    mt = {} -- Create the metatable
+    local mt = {} -- Create the metatable
     mt.__newindex = function (self, key, value)
         if value == nil then
             if tonumber(key) then
@@ -39,3 +39,5 @@ function create_meta_table()
     setmetatable(tbl, mt)
     return tbl
 end
+
+_export = {create_meta_table=create_meta_table}
